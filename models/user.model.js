@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
       address: String,
       pin_code: String,
       district: String,
-      area: String, 
+      area: String,
       state: String,
       country: String,
       aadhar_num: String,
@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema(
     ],
     designation: {
       type: String,
-      enum: ["organizer", "territory manager", "user"],
+      enum: ["user", "promoter", "silver", "platinum", "emerald", "ruby", "diamond"],
       default: "user",
     },
   },
@@ -100,7 +100,7 @@ userSchema.methods.generateToken = function () {
   return jwt.sign(
     { id: this._id, phone: this.phone, role: this.role },
     process.env.JWT_SECRET || "defaultSecret",
-    { expiresIn: "7d" }
+    { expiresIn: "30" }
   );
 };
 const User = mongoose.model("User", userSchema);

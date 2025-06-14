@@ -28,6 +28,7 @@ const UserController = {
   },
   fetchReferralData: async (req, res) => {
     try {
+      console.log(req.params.id, "id");
       const refer_id = req.params.id;
       const user = await User.findById(refer_id);
       if (!user) {
@@ -50,6 +51,7 @@ const UserController = {
         phone: user.phone,
         name: user.full_name,
         designation: user.designation,
+        status: user.status,
       };
       res.json(dashboardData);
     } catch (error) {
@@ -79,7 +81,7 @@ const UserController = {
       const referrals = await User.find({ referred_by: user_id })
         .skip(skip)
         .limit(limit)
-        .select("full_name email phone createdAt"); // select only what’s needed
+        .select("full_name email phone status createdAt"); // select only what’s needed
 
       res.json({
         referrals,

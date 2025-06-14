@@ -9,6 +9,9 @@ import User from "../models/user.model.js";
 import Notification from "../models/notification.model.js";
 
 import Wallet from "../models/wallet.model.js";
+import Admin from "../models/admin.model.js";
+import { get } from "http";
+import { create } from "domain";
 const generateMonthlyReferralData = async (userId, year) => {
   const monthlyData = {};
   for (let month = 0; month < 12; month++) {
@@ -27,11 +30,57 @@ const generateMonthlyReferralData = async (userId, year) => {
 };
 
 const AdminController = {
+  login: async (req, res) => {
+    try {
+      const { phone, password } = req.body;
+      const user = await Admin.findOne({ phone });
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      const token = user.generateToken(); // ✅ This should now work
+      res.status(200).json({ message: "Login successful", token });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+
+
+  getAdmins: async (req, res) => {
+    try {
+      const admins = await Admin.find({});
+      res.json({ admins });
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+
+  createAdmin: async (req, res) => {
+    try {
+      const { name, phone, password } = req.body;
+      const findUser = await Admin.findOne({ phone });
+      if (findUser) {
+        return res.status(400).json({ message: "Admin already exists" });
+      }
+      const admin = new Admin({ name, phone, password });
+      await admin.save();
+      res.json({ message: "Admin created successfully" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
   getDashUsers: async (req, res) => {
     try {
       const filter = req.query.filter || "";
       const users = await User.find({}).select("full_name role phone");
-      res.json(users);
+      const totalusers = await User.countDocuments({});
+      res.json({ users, totalusers });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -110,14 +159,14 @@ const AdminController = {
         }
         users = currentUser.referred_by
           ? [
-              {
-                _id: currentUser.referred_by._id,
-                full_name: currentUser.referred_by.full_name,
-                phone: currentUser.referred_by.phone,
-                email: currentUser.referred_by.email,
-                reg_date: currentUser.referred_by.reg_date,
-              },
-            ]
+            {
+              _id: currentUser.referred_by._id,
+              full_name: currentUser.referred_by.full_name,
+              phone: currentUser.referred_by.phone,
+              email: currentUser.referred_by.email,
+              reg_date: currentUser.referred_by.reg_date,
+            },
+          ]
           : [];
       }
 
