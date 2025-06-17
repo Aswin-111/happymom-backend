@@ -10,6 +10,7 @@ const uploadxlsx = multer({ dest: "uploads/xlsx" });
 router.post("/login", AdminController.login);
 router.get('/getadmins', AdminController.getAdmins);
 router.post("/create-admin", AdminController.createAdmin);
+router.delete("/delete-admin/:id", AdminController.deleteAdmin);
 router.get("/dashusers", AdminController.getDashUsers);
 router.get("/reset-password", AdminController.resetPassword);
 router.get("/userdashboard", AdminController.getDashboardaData);

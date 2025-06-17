@@ -75,6 +75,19 @@ const AdminController = {
       res.status(500).json({ message: error.message });
     }
   },
+  deleteAdmin: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const admin = await Admin.findById(id);
+      if (!admin) return res.status(404).json({ message: "Admin not found" });
+
+      await Admin.findByIdAndDelete(id);
+      res.json({ message: "Admin deleted successfully" });
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ message: error.message });
+    }
+  },
   getDashUsers: async (req, res) => {
     try {
       const filter = req.query.filter || "";
@@ -324,6 +337,7 @@ const AdminController = {
       return res.status(500).json({ message: "Server Error" });
     }
   },
+
   addCreditPoints: async (req, res) => {
     try {
       const { userId, creditAmount, description } = req.body;

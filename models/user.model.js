@@ -100,7 +100,7 @@ userSchema.methods.generateToken = function () {
   return jwt.sign(
     { id: this._id, phone: this.phone, role: this.role },
     process.env.JWT_SECRET || "defaultSecret",
-    { expiresIn: "30" }
+    { expiresIn: "30d" }
   );
 };
 const User = mongoose.model("User", userSchema);
